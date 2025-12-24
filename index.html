@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>PCESP Live Overlay</title>
+<title>PCESP Bodycam Overlay</title>
 
 <style>
 :root {
-    --logo-size: 42px; /* AJUSTE O TAMANHO DA LOGO */
+    --logo-size: 40px;
 }
 
 * {
@@ -21,17 +21,17 @@ body {
     font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-/* OVERLAY COMPACTO */
+/* OVERLAY RETANGULAR */
 .overlay {
     position: fixed;
     top: 24px;
     right: 24px;
-    width: 245px;
-    background: rgba(0, 0, 0, 0.82);
-    border-left: 3px solid #b71c1c;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 0 16px rgba(183, 28, 28, 0.55);
+    width: 260px;
+    background: rgba(0, 0, 0, 0.85);
+    border-left: 4px solid #b71c1c;
+    border-radius: 4px; /* MAIS RETANGULAR */
+    padding: 10px 12px;
+    box-shadow: 0 0 14px rgba(183, 28, 28, 0.55);
     z-index: 99999;
 }
 
@@ -91,10 +91,10 @@ body {
 
 .text .agent {
     font-size: 11px;
-    color: #cfcfcf;
+    color: #d0d0d0;
 }
 
-/* INFO */
+/* INFO (DATA + HORA) */
 .info {
     margin-top: 6px;
     display: flex;
@@ -132,7 +132,7 @@ body {
 
 <div class="overlay">
 
-    <!-- BOYCAM / LIVE -->
+    <!-- BOYCAM -->
     <div class="live">
         <div class="rec-dot"></div> AO VIVO
     </div>
@@ -149,10 +149,10 @@ body {
         </div>
     </div>
 
-    <!-- INFO -->
+    <!-- DATA E HORA -->
     <div class="info">
-        <div>⏱️ <span id="clock"></span></div>
-        <div>📍 OP: ALFA-07</div>
+        <div id="date"></div>
+        <div id="clock"></div>
     </div>
 
     <!-- RÁDIO -->
@@ -168,16 +168,22 @@ body {
 </div>
 
 <script>
-function updateClock() {
+function updateDateTime() {
+    const now = new Date();
+
     document.getElementById("clock").innerText =
-        new Date().toLocaleTimeString("pt-BR", {
+        now.toLocaleTimeString("pt-BR", {
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            second: '2-digit'
         });
+
+    document.getElementById("date").innerText =
+        now.toLocaleDateString("pt-BR");
 }
 
-setInterval(updateClock, 1000);
-updateClock();
+setInterval(updateDateTime, 1000);
+updateDateTime();
 </script>
 
 </body>
