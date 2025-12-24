@@ -6,7 +6,7 @@
 
 <style>
 :root {
-    --logo-size: 40px;
+    --logo-size: 36px;
 }
 
 * {
@@ -15,24 +15,49 @@
 
 body {
     margin: 0;
-    padding: 0;
     background: transparent;
     overflow: hidden;
     font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-/* OVERLAY RETANGULAR */
+/* OVERLAY */
 .overlay {
     position: fixed;
-    top: 24px;
+    top: 28px;
     right: 24px;
     width: 260px;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.88);
     border-left: 4px solid #b71c1c;
-    border-radius: 4px; /* MAIS RETANGULAR */
+    border-radius: 4px;
     padding: 10px 12px;
-    box-shadow: 0 0 14px rgba(183, 28, 28, 0.55);
+    box-shadow: 0 0 14px rgba(183, 28, 28, 0.6);
     z-index: 99999;
+}
+
+/* TOGGLE PEQUENO */
+.toggle {
+    position: fixed;
+    top: 5px;
+    right: 10px;
+    z-index: 100000;
+}
+
+.toggle input {
+    display: none;
+}
+
+.slider {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: red;
+    border: 1px solid #000;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+input:checked + .slider {
+    background: #00ff4c;
 }
 
 /* LIVE */
@@ -41,14 +66,14 @@ body {
     align-items: center;
     font-size: 11px;
     font-weight: bold;
-    color: #ff5252;
+    color: #f00000;
     letter-spacing: 1px;
     margin-bottom: 6px;
 }
 
 .rec-dot {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     background: red;
     border-radius: 50%;
     margin-right: 6px;
@@ -56,23 +81,19 @@ body {
 }
 
 @keyframes blink {
-    0% { opacity: 1; }
     50% { opacity: 0.3; }
-    100% { opacity: 1; }
 }
 
-/* CONTEÚDO */
+/* CONTENT */
 .content {
     display: flex;
     align-items: center;
 }
 
-/* LOGO */
 .logo {
     width: var(--logo-size);
     height: var(--logo-size);
     margin-right: 8px;
-    flex-shrink: 0;
 }
 
 .logo img {
@@ -81,12 +102,10 @@ body {
     object-fit: contain;
 }
 
-/* TEXTO */
 .text .unit {
     font-size: 12px;
     font-weight: bold;
     color: #ffffff;
-    text-transform: uppercase;
 }
 
 .text .agent {
@@ -94,7 +113,7 @@ body {
     color: #d0d0d0;
 }
 
-/* INFO (DATA + HORA) */
+/* INFO */
 .info {
     margin-top: 6px;
     display: flex;
@@ -103,18 +122,13 @@ body {
     color: #bdbdbd;
 }
 
-/* RADIO */
-.radio {
+/* STATUS */
+.status {
     margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
     font-size: 10px;
-    color: #00e676;
-    animation: radioBlink 1.5s infinite;
-}
-
-@keyframes radioBlink {
-    0% { opacity: 1; }
-    50% { opacity: 0.4; }
-    100% { opacity: 1; }
+    color: #81c784;
 }
 
 /* FOOTER */
@@ -122,7 +136,6 @@ body {
     margin-top: 4px;
     font-size: 9px;
     color: #9e9e9e;
-    letter-spacing: 0.5px;
     text-transform: uppercase;
 }
 </style>
@@ -130,56 +143,86 @@ body {
 
 <body>
 
-<div class="overlay">
+<!-- TOGGLE -->
+<label class="toggle">
+    <input type="checkbox" id="toggleCam">
+    <div class="slider"></div>
+</label>
 
-    <!-- BOYCAM -->
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+
     <div class="live">
         <div class="rec-dot"></div> AO VIVO
     </div>
 
-    <!-- CONTEÚDO -->
     <div class="content">
         <div class="logo">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bras%C3%A3o_Nacional_PCSP.png" alt="PCESP">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bras%C3%A3o_Nacional_PCSP.png">
         </div>
-
         <div class="text">
             <div class="unit">PCESP • ADJUNTO GERAL</div>
             <div class="agent">DELEGADO: VK DELMONDES</div>
         </div>
     </div>
 
-    <!-- DATA E HORA -->
     <div class="info">
         <div id="date"></div>
         <div id="clock"></div>
     </div>
 
-    <!-- RÁDIO -->
-    <div class="radio">
-        📻 RÁDIO ATIVO • CANAL 197
+    <div class="status">
+        <div>🎥 CAMERA CORPORAL-01</div>
+        <div>REC <span id="timer">00:00:00</span></div>
     </div>
 
-    <!-- FOOTER -->
     <div class="footer">
-        BODYCAM • OPERAÇÃO
+        BODYCAM • PCESP | PIRITUBA
     </div>
 
 </div>
 
 <script>
+const toggle = document.getElementById("toggleCam");
+const overlay = document.getElementById("overlay");
+
+let startTime = Date.now();
+
+// RESTAURA ESTADO
+const saved = localStorage.getItem("bodycam");
+toggle.checked = saved !== "off";
+updateState();
+
+toggle.addEventListener("change", () => {
+    localStorage.setItem("bodycam", toggle.checked ? "on" : "off");
+    updateState();
+});
+
+function updateState() {
+    if (toggle.checked) {
+        overlay.style.display = "block";
+        startTime = Date.now();
+    } else {
+        overlay.style.display = "none";
+    }
+}
+
 function updateDateTime() {
     const now = new Date();
 
     document.getElementById("clock").innerText =
-        now.toLocaleTimeString("pt-BR", {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+        now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     document.getElementById("date").innerText =
         now.toLocaleDateString("pt-BR");
+
+    if (toggle.checked) {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+        const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+        const s = String(elapsed % 60).padStart(2, '0');
+        document.getElementById("timer").innerText = `${h}:${m}:${s}`;
+    }
 }
 
 setInterval(updateDateTime, 1000);
